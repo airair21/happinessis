@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="style.css">
+    <script crossorigin="anonymous" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+
+</head>
+<body class="form">
+
+    <p>
+        Answer as long or as short as you want. Separate different ideas for the same question with commas, like so: one, two, third idea
+    </p>
+    
+<!-- age -->
+    <form>
+        <label for="age">Age:</label>
+        <p>
+            <input type="number" id="age" name="age"><br>
+        </p>
+        <!-- <input type="number" id="age" name="age"><br> -->
+
+<!-- manifest -->
+        <div id="manifest-form" action="/your-action-here">
+            <!-- <p>
+                How does happiness manifest in your life?
+            </p> -->
+            <label for="manifest">How does happiness manifest in your life?</label><br><br>
+            <input type="text" class="manifest" name="manifest"><br>
+
+            <div class="manifest-fields"></div>
+        
+            <p>
+                <button type="button" class="add-manifest-fields">
+                    Add more
+                </button>
+                <!-- <button type="button" class="remove-manifest-fields">
+                    Remove these fields
+                </button> -->
+            </p><br>
+        </div>
+        <!--
+            text/x-templates is a fake type  just to tell
+           the browser to ignore this script block
+        -->
+        <script type="text/x-templates" id="fields-templates">
+            <p class="manifest-input-fields">
+                <input type="text" class="manifest" name="manifest"><br>
+            </p>
+        </script>
+
+
+        <!-- <label for="manifest">How does happiness manifest in your life?</label><br>
+        <input type="text" id="manifest" name="manifest"><br> -->
+
+
+<!-- happiness right now-->
+        <div id="toyou-form" action="/your-action-here">
+            <label for="toyou">What is happiness to you right now?</label><br><br>
+            <input type="text" class="toyou" name="toyou"><br>
+
+            <div class="toyou-fields"></div>
+
+            <p>
+                <button type="button" class="add-toyou-fields">
+                    Add more
+                </button>
+            </p><br>
+        </div>
+        <script type="text/x-templates" id="fields-templates">
+            <p class="toyou-input-fields">
+                <input type="text" class="toyou" name="toyou"><br>
+            </p>
+        </script>
+
+
+<!-- happiness 2 years ago -->
+        <div id="toyou2-form" action="/your-action-here">
+            <label for="toyou2">What was happiness to you two years ago?</label><br><br>
+            <input type="text" class="toyou2" name="toyou2"><br>
+
+            <div class="toyou2-fields"></div>
+
+            <p>
+                <button type="button" class="add-toyou2-fields">
+                    Add more
+                </button>
+            </p><br>
+        </div>
+        <script type="text/x-templates" id="fields-templates">
+            <p class="toyou2-input-fields">
+                <input type="text" class="toyou2" name="toyou2"><br>
+            </p>
+        </script>
+
+
+<!-- happines 5 years ago -->
+        <div id="toyou5-form" action="/your-action-here">
+            <label for="toyou5">What was happiness to you five years ago?</label><br><br>
+            <input type="text" class="toyou5" name="toyou5"><br>
+
+            <div class="toyou5-fields"></div>
+
+            <p>
+                <button type="button" class="add-toyou5-fields">
+                    Add more
+                </button>
+            </p><br>
+        </div>
+        <script type="text/x-templates" id="fields-templates">
+            <p class="toyou5-input-fields">
+                <input type="text" class="toyou5" name="toyou5"><br>
+            </p>
+        </script>
+
+<!-- happines 10 years ago -->
+        <div id="toyou10-form" action="/your-action-here">
+            <label for="toyou10">What was happiness to you ten years ago?</label><br><br>
+            <input type="text" class="toyou10" name="toyou10"><br>
+
+            <div class="toyou10-fields"></div>
+
+            <p>
+                <button type="button" class="add-toyou10-fields">
+                    Add more
+                </button>
+            </p><br>
+        </div>
+        <script type="text/x-templates" id="fields-templates">
+            <p class="toyou10-input-fields">
+                <input type="text" class="toyou10" name="toyou10"><br>
+            </p>
+        </script>
+
+
+<!-- purpose -->
+        <div id="purpose-form" action="/your-action-here">
+            <label for="purpose">How does happiness influence your sense of purpose?</label><br><br>
+            <input type="text" class="purpose" name="purpose"><br>
+
+            <div class="purpose-fields"></div>
+
+            <p>
+                <button type="button" class="add-purpose-fields">
+                    Add more
+                </button>
+            </p><br>
+        </div>
+        <script type="text/x-templates" id="fields-templates">
+            <p class="purpose-input-fields">
+                <input type="text" class="purpose" name="purpose"><br>
+            </p>
+        </script>
+
+
+<!-- feeling -->
+
+        <div id="feeling-form" action="/your-action-here">
+            <label for="feeling">How would you define happiness through a different emotion (ex: curiousity) or feeling (ex: peace of mind)?</label><br><br>
+            <input type="text" class="feeling" name="feeling"><br>
+
+            <div class="feeling-fields"></div>
+
+            <p>
+                <button type="button" class="add-feeling-fields">
+                    Add more
+                </button>
+            </p><br>
+        </div>
+        <script type="text/x-templates" id="fields-templates">
+            <p class="feeling-input-fields">
+                <input type="text" class="feeling" name="feeling"><br>
+            </p>
+        </script>
+
+
+
+        <!-- <script type="text/x-templates" id="age-templates">
+            <p class="input-fields">
+                <label for="age">Age:</label><br>
+                <input type="number" id="age" name="age"><br>
+            </p>
+        </script>
+
+        <form id="age-form" action="/your-action-here">
+
+            <div class="age-fields"></div>
+        
+            <p>
+                <button type="button" class="add-age-fields">
+                    Add Age fields
+                </button>
+            </p>
+        </form> -->
+
+
+        <!-- <form id="manifest-form" action="/your-action-here">
+            <p>
+                How does happiness manifest in your life?
+            </p>
+            <div class="manifest-fields"></div>
+        
+            <p>
+                <button type="button" class="add-manifest-fields">
+                    Add MANIFEST fields
+                </button>
+            </p>
+        </form> -->
+        <!--
+            text/x-templates is a fake type  just to tell
+           the browser to ignore this script block
+        -->
+        <!-- <script type="text/x-templates" id="fields-templates">
+            <p class="age-input-fields">
+                <input type="text" id="manifest" name="manifest"><br>
+            </p>
+        </script> -->
+
+
+        <!-- <label for="fname">First name:</label><br>
+        <input type="text" id="fname" name="fname"><br>
+
+
+        <label for="emotion">Happiness is emotion:</label><br>
+        <input type="text" id="emotion" name="emotion"> -->
+    </form>
+
+    <button id="pushbutton" type="submit">
+        push
+    </button>
+
+    <div class="output">
+
+    </div>
+
+
+
+    
+
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
