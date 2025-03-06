@@ -20,15 +20,29 @@ body {
 
     /* border: 5px solid red; */
 }
+.form form div {
+    width: 100%;
+    /* border: red dotted 2px; */
+}
+
 form {
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 40%;
 }
-form input {
+form div input {
     width: 100%;
     margin-bottom: 3%;
     padding: 1%;
     /* height: 10vh; */
+}
+
+#pushbutton {
+    background-color: greenyellow;
+    opacity: 50%;
+    transition: .3s;
+}
+#pushbutton:hover {
+    opacity: 100%;
 }
