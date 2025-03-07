@@ -320,8 +320,6 @@ $(function () {
 });
 
 
-
-
 $(function () {
     var FIELDS_TEMPLATE = $('#fields-templates').text();
     var $form = $('#feeling-form');
