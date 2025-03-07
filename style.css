@@ -39,10 +39,30 @@ form div input {
 }
 
 #pushbutton {
-    background-color: greenyellow;
-    opacity: 50%;
+    background-color: orange;
+    /* opacity: 50%; */
     transition: .3s;
 }
 #pushbutton:hover {
-    opacity: 100%;
+    /* opacity: 100%; */
+    background-color: greenyellow;
+}
+
+.circleDiv {
+    border: burlywood 3px double;
+    width: 100%; 
+    height: 100%;
+    border-radius: 50%
+}
+
+.circle {
+    width: auto;
+    height: auto;
+    border-radius: 50%;
+    background-color: lightblue;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px;
+
 }

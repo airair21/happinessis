@@ -27,6 +27,80 @@ const feeling = document.getElementById('feeling');
 
 const pushbutton = document.getElementById('pushbutton'); 
 
+// const manifestArray = Object.values(data)
+
+
+
+// parse out data
+
+
+// function fetchManifestData() {
+//     database.ref('manifests') 
+//         .once('value')
+//          .then(snapshot => {
+//           let data = snapshot.val();
+//           console.log("Data from Firebase:", data); // Log the data to inspect its structure
+
+//             if (data) {
+//                 let manifestArray = Object.values(data); 
+//                 // let manifestArray = Object.values(data).map(item => item.manifest);
+//                 displayCircles(manifestArray);
+//             } else {
+//                 console.log("BLEHHH");
+//             }
+//         })
+//         .catch(error => console.error("Error fetching data:", error));
+//     }
+
+
+// Store the reference (aka the key that's the label for the data) in a variable
+
+
+function fetchManifestData() {
+    database.ref('inputs')  // Changed from 'manifest' to 'inputs' to match where data is being stored
+        .once('value')
+        .then(snapshot => {
+            let data = snapshot.val();
+            if (data) {
+                let manifestArray = Object.values(data)
+                    .map(item => item?.manifest) // Safely access manifest property
+                    .filter(manifest => manifest); // Filter out undefined or null values
+
+                // Split each manifest string by commas and flatten the resulting arrays
+                let newArray = manifestArray.flatMap(manifest => manifest.split(','));
+
+                // Now newArray contains all individual values
+                displayCircles(newArray);
+            } else {
+                console.log("No data found");
+            }
+        })
+        .catch(error => console.error("Error fetching data:", error));
+}
+
+
+
+// CREATE AN ARRAY FOR EACH ONE
+
+    function displayCircles(manifestArray) {
+    
+        let bigBox = document.getElementById('container');
+    
+        manifestArray.forEach(manifestArray => {
+            let circleDiv = document.createElement('div');
+            circleDiv.classList.add('circle');
+            circleDiv.innerText = manifestArray; 
+            bigBox.append(circleDiv);
+        });
+    }
+
+    document.getElementById('showbutton').addEventListener('click', function() {
+        fetchManifestData();
+    });
+    
+
+    //Input and submitting
+
 pushbutton.onclick = function (event) {
     event.preventDefault();
 
@@ -71,6 +145,11 @@ pushbutton.onclick = function (event) {
         feeling: feelingValues.join(', ')
     };
 
+
+    // LOG CURRENT YEAR AS NEW OBJECT VALUE
+
+
+
     // emotion.value = "";
 
     ref.push(text);
@@ -91,6 +170,31 @@ console.log(snapshot.val());
 }, (errorObject) => {
     console.log("NAUR");
 });
+
+
+
+
+    // for (let i = 0; i < database.length; i++) {
+    //     console.log('works??');
+    
+    //     let circleDiv = document.createElement('div');
+    //     let bigBox = document.getElementById('container');
+    //     let manifestValue = database[i].manifest; 
+    
+    //     circleDiv.innerText = manifestValue; 
+    //     circleDiv.style.width = '10vw'; 
+    //     circleDiv.style.height = '10vh';
+    //     circleDiv.style.borderRadius = '50%';
+    //     circleDiv.style.display = 'flex';
+    //     circleDiv.style.alignItems = 'center';
+    //     circleDiv.style.justifyContent = 'center';
+    //     circleDiv.style.background = 'lightblue';
+    //     circleDiv.style.margin = '1em';
+    
+    //     bigBox.append(circleDiv); 
+    // }
+    
+        
 
 // value/emotion
 
@@ -215,8 +319,11 @@ $(function () {
     });
 });
 
+
+
+
 $(function () {
-    var FIELDS_TEMPLATE = $('#feeling-templates').text();
+    var FIELDS_TEMPLATE = $('#fields-templates').text();
     var $form = $('#feeling-form');
     var $fields = $form.find('.feeling-fields');
 
@@ -228,3 +335,5 @@ $(function () {
         $(event.target).closest('.feeling-input-fields').remove();
     });
 });
+
+
