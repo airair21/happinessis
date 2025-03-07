@@ -334,3 +334,243 @@ $(function () {
 });
 
 
+
+
+
+
+// P5 START
+
+// Initialize variables
+let bubbles = [];
+let connections = [];
+let filteredBubbles = [];
+let filteredConnections = [];
+let clickedInstance = null;
+
+// List of common words to exclude from connections
+const COMMON_WORDS = new Set(['and', 'i', 'to', 'the', 'a', 'of', 'in', 'it', 'is', 'that', 'with', 'for', 'on', 'are', 'as', 'be', 'at', 'or', 'was', 'but', 'not', 'you', 'this', 'have', 'he', 'she', 'we', 'they', 'my', 'your', 'their', 'our', 'me', 'him', 'her', 'us', 'them', 'when']);
+
+// Canvas and context
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+// DOM elements
+const searchInput = document.getElementById('search-input');
+const clearButton = document.getElementById('clear-button');
+
+// Initialize canvas size
+function initializeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+
+// Initialize bubbles
+function initializeBubbles() {
+  for (let i = 0; i < data.length; i++) {
+    let bubble = {
+      instance: data[i].instance,
+      color: data[i].color,
+      id: data[i].id,
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      connections: 0,
+      diameter: calculateBubbleDiameter(data[i].instance)
+    };
+    bubbles.push(bubble);
+  }
+  filteredBubbles = bubbles;
+  filteredConnections = connections;
+}
+
+// Calculate bubble diameter based on text
+function calculateBubbleDiameter(instance) {
+  ctx.font = '12px Arial';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  let words = instance.split(' ');
+  let maxLineWidth = 0;
+  let lineHeight = 14.4; // 12px * 1.2
+
+  let currentLine = '';
+  for (let word of words) {
+    let testLine = currentLine === '' ? word : currentLine + ' ' + word;
+    let testWidth = ctx.measureText(testLine).width;
+
+    if (testWidth <= 111) {
+      currentLine = testLine;
+    } else {
+      maxLineWidth = Math.max(maxLineWidth, ctx.measureText(currentLine).width);
+      currentLine = word;
+    }
+  }
+  maxLineWidth = Math.max(maxLineWidth, ctx.measureText(currentLine).width);
+
+  let numLines = Math.ceil(ctx.measureText(instance).width / maxLineWidth);
+  let padding = 20;
+  let diameter = Math.max(maxLineWidth, numLines * lineHeight) + padding;
+
+  return diameter;
+}
+
+// Establish connections between bubbles
+function establishConnections() {
+  for (let i = 0; i < bubbles.length; i++) {
+    for (let j = i + 1; j < bubbles.length; j++) {
+      if (shareWords(bubbles[i].instance, bubbles[j].instance)) {
+        connections.push([bubbles[i], bubbles[j]]);
+        bubbles[i].connections++;
+        bubbles[j].connections++;
+      }
+    }
+  }
+}
+
+// Check if two instances share words
+function shareWords(instanceA, instanceB) {
+  let wordsA = instanceA
+    .toLowerCase()
+    .split(' ')
+    .filter(word => !COMMON_WORDS.has(word));
+  let wordsB = instanceB
+    .toLowerCase()
+    .split(' ')
+    .filter(word => !COMMON_WORDS.has(word));
+  return wordsA.some(word => wordsB.includes(word));
+}
+
+// Filter bubbles based on search term or clicked instance
+function filterBubbles() {
+  let searchTerm = searchInput.value.toLowerCase();
+  if (searchTerm === '' && clickedInstance === null) {
+    filteredBubbles = bubbles;
+    filteredConnections = connections;
+  } else {
+    filteredBubbles = bubbles.filter(bubble =>
+      bubble.instance.toLowerCase().includes(searchTerm) ||
+      bubble.id === clickedInstance
+    );
+
+    filteredConnections = connections.filter(conn => {
+      let bubbleA = conn[0];
+      let bubbleB = conn[1];
+      return (
+        filteredBubbles.includes(bubbleA) || filteredBubbles.includes(bubbleB)
+      );
+    });
+
+    for (let conn of filteredConnections) {
+      let bubbleA = conn[0];
+      let bubbleB = conn[1];
+      if (!filteredBubbles.includes(bubbleA)) filteredBubbles.push(bubbleA);
+      if (!filteredBubbles.includes(bubbleB)) filteredBubbles.push(bubbleB);
+    }
+  }
+  draw();
+}
+
+// Draw the visualization
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Draw connections
+  for (let conn of filteredConnections) {
+    let bubbleA = conn[0];
+    let bubbleB = conn[1];
+    ctx.beginPath();
+    ctx.moveTo(bubbleA.x, bubbleA.y);
+    ctx.lineTo(bubbleB.x, bubbleB.y);
+    ctx.strokeStyle = `rgba(0, 0, 0, ${Math.min(1, bubbleA.connections / 6)})`;
+    ctx.lineWidth = Math.max(0.5, bubbleA.connections / 3);
+    ctx.stroke();
+  }
+
+  // Draw bubbles
+  for (let bubble of filteredBubbles) {
+    ctx.beginPath();
+    ctx.arc(bubble.x, bubble.y, bubble.diameter / 2, 0, Math.PI * 2);
+    ctx.fillStyle = bubble.color;
+    ctx.fill();
+
+    // Draw text
+    drawTextBlock(bubble);
+
+    // Highlight clicked bubble
+    if (bubble.id === clickedInstance) {
+      ctx.strokeStyle = 'red';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+  }
+}
+
+// Draw text inside a bubble
+function drawTextBlock(bubble) {
+  ctx.fillStyle = 'black';
+  ctx.font = '12px Arial';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  let words = bubble.instance.split(' ');
+  let lines = [];
+  let currentLine = words[0];
+
+  for (let i = 1; i < words.length; i++) {
+    let word = words[i];
+    let testLine = currentLine + ' ' + word;
+    let testWidth = ctx.measureText(testLine).width;
+
+    if (testWidth <= bubble.diameter * 0.8) {
+      currentLine = testLine;
+    } else {
+      lines.push(currentLine);
+      currentLine = word;
+    }
+  }
+  lines.push(currentLine);
+
+  let lineHeight = 14.4;
+  let totalHeight = lines.length * lineHeight;
+  let y = bubble.y - (totalHeight / 2) + (lineHeight / 2);
+
+  for (let line of lines) {
+    ctx.fillText(line, bubble.x, y);
+    y += lineHeight;
+  }
+}
+
+// Event listeners
+searchInput.addEventListener('input', filterBubbles);
+clearButton.addEventListener('click', () => {
+  searchInput.value = '';
+  clickedInstance = null;
+  filterBubbles();
+});
+
+canvas.addEventListener('mousedown', (e) => {
+  let rect = canvas.getBoundingClientRect();
+  let mouseX = e.clientX - rect.left;
+  let mouseY = e.clientY - rect.top;
+
+  for (let bubble of filteredBubbles) {
+    let distance = Math.sqrt((mouseX - bubble.x) ** 2 + (mouseY - bubble.y) ** 2);
+    if (distance < bubble.diameter / 2) {
+      clickedInstance = bubble.id;
+      searchInput.value = bubble.instance;
+      filterBubbles();
+      break;
+    }
+  }
+});
+
+// Initialize
+initializeCanvas();
+initializeBubbles();
+establishConnections();
+draw();
+
+// Handle window resize
+window.addEventListener('resize', () => {
+  initializeCanvas();
+  draw();
+});
