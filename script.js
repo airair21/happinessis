@@ -94,9 +94,9 @@ function fetchManifestData() {
         });
     }
 
-    document.getElementById('showbutton').addEventListener('click', function() {
-        fetchManifestData();
-    });
+    // document.getElementById('showbutton').addEventListener('click', function() {
+    //     fetchManifestData();
+    // });
     
 
     //Input and submitting
