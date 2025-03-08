@@ -66,3 +66,15 @@ form div input {
     margin: 10px;
 
 }
+
+canvas {
+    display: block;
+}
+.bubble {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    text-align: center;
+    overflow: hidden;
+}
