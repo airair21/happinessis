@@ -24,18 +24,27 @@ body {
     width: 100%;
     /* border: red dotted 2px; */
 }
-
-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 40%;
+.p5 {
+    padding: 0;
+    margin: 0%;
 }
+
+/* form {
+
+} */
 form div input {
     width: 100%;
     margin-bottom: 3%;
     padding: 1%;
     /* height: 10vh; */
+}
+
+#container {
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 40%;
 }
 
 #pushbutton {
@@ -69,6 +78,9 @@ form div input {
 
 canvas {
     display: block;
+    background-color: aquamarine;
+    /* width: 100px;
+    height: 100px; */
 }
 .bubble {
     display: flex;
