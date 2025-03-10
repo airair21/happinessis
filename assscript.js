@@ -64,14 +64,21 @@ function initializeBubbles(newArray) {
 
     // Iterate over the newArray to create bubbles
     for (let i = 0; i < newArray.length; i++) {
+        let manifestValue = newArray[i].trim(); // Trim whitespace from the manifest value
+
+        // Skip empty or whitespace-only values
+        if (manifestValue === '') {
+            continue;
+        }
+
         let bubble = {
-            instance: newArray[i], // Use the current manifest value
+            instance: manifestValue, // Use the trimmed manifest value
             color: getRandomColor(), // Assign a random color
             id: i, // Use the index as the ID (or generate a unique ID)
             x: random(width), // Random x position within the canvas
             y: random(height), // Random y position within the canvas
             connections: 0, // Initialize connections to 0
-            diameter: calculateBubbleDiameter(newArray[i]) // Calculate diameter based on text
+            diameter: calculateBubbleDiameter(manifestValue) // Calculate diameter based on text
         };
         bubbles.push(bubble);
     }
@@ -222,14 +229,16 @@ function drawTextBlock(bubble) {
 
 // Draw bubbles and connections
 function draw() {
-    background(100);
+    background(255);
 
     // Draw connections for filtered bubbles
     for (let conn of filteredConnections) {
         let bubbleA = conn[0];
         let bubbleB = conn[1];
-        strokeWeight(map(bubbleA.connections, 1, 10, 0.5, 1));
-        stroke(lerpColor(color(bubbleA.color), color(0), map(bubbleA.connections, 1, max(bubbleA.connections, bubbleB.connections), 0, 1)));
+
+        // Set stroke color to black
+        stroke(23,23,222); // Black color
+        strokeWeight(map(bubbleA.connections, 1, 10, 0.5, 1)); // Adjust stroke weight based on connections
         line(bubbleA.x, bubbleA.y, bubbleB.x, bubbleB.y);
     }
 
@@ -257,6 +266,10 @@ function mouseDragged() {
             bubble.x = mouseX;
             bubble.y = mouseY;
 
+            // Constrain the bubble within the canvas boundaries
+            bubble.x = constrain(bubble.x, bubble.diameter / 2, width - bubble.diameter / 2);
+            bubble.y = constrain(bubble.y, bubble.diameter / 2, height - bubble.diameter / 2);
+
             // Prevent overlapping with other bubbles
             for (let otherBubble of bubbles) {
                 if (otherBubble !== bubble && checkCollision(bubble, otherBubble)) {
@@ -265,6 +278,10 @@ function mouseDragged() {
                     let distance = (bubble.diameter + otherBubble.diameter) / 2;
                     otherBubble.x = bubble.x + cos(angle) * distance;
                     otherBubble.y = bubble.y + sin(angle) * distance;
+
+                    // Constrain the other bubble within the canvas boundaries
+                    otherBubble.x = constrain(otherBubble.x, otherBubble.diameter / 2, width - otherBubble.diameter / 2);
+                    otherBubble.y = constrain(otherBubble.y, otherBubble.diameter / 2, height - otherBubble.diameter / 2);
                 }
             }
         }
@@ -292,6 +309,10 @@ function repositionBubbles() {
     for (let bubble of bubbles) {
         bubble.x *= scaleX;
         bubble.y *= scaleY;
+
+        // Constrain the bubble within the canvas boundaries
+        bubble.x = constrain(bubble.x, bubble.diameter / 2, width - bubble.diameter / 2);
+        bubble.y = constrain(bubble.y, bubble.diameter / 2, height - bubble.diameter / 2);
     }
 }
 
@@ -299,8 +320,8 @@ function repositionBubbles() {
 function mouseClicked() {
     let clickedBubble = null;
 
-    // Check if a bubble was clicked
-    for (let bubble of bubbles) {
+    // Check if a bubble was clicked (only check filteredBubbles)
+    for (let bubble of filteredBubbles) {
         if (dist(mouseX, mouseY, bubble.x, bubble.y) < bubble.diameter / 2) {
             clickedBubble = bubble;
             break;
@@ -354,8 +375,6 @@ function mouseClicked() {
 // Setup the canvas and UI
 function setup() {
     createCanvas(windowWidth, windowHeight);
-    fullscreen(true); // Enter fullscreen mode
-
 
     searchInput = createInput();
     searchInput.position(88, 88);
@@ -364,7 +383,7 @@ function setup() {
     searchInput.input(filterBubbles);
 
     let clearButton = createButton('Clear');
-    clearButton.position(333, 88);
+    clearButton.position(320, 88);
     clearButton.mousePressed(() => {
         searchInput.value('');
         clickedInstance = null;
