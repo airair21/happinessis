@@ -1,8 +1,54 @@
+@font-face {
+    font-family: ElzaReg;
+    src: url(assets/Elza\ Text\ Regular.woff2);
+    line-height: 220%;
+}
+@font-face {
+    font-family: ElzaRegOb;
+    src: url(assets/Elza\ Text\ Oblique.woff2.woff2);
+}
+@font-face {
+    font-family: ElzaLight;
+    src: url(assets/Elza\ Text\ Light.woff2);
+}
+@font-face {
+    font-family: ElzaLightOb;
+    src: url(assets/Elza\ Text\ Light\ Oblique.woff2);
+}
+@font-face {
+    font-family: ElzaBold;
+    src: url(assets/Elza\ Text\ Bold.woff2);
+}
+@font-face {
+    font-family: ElzaBoldOb;
+    src: url(assets/Elza\ Text\ Bold\ Oblique.woff2);
+}
+
+
+button {
+    font-family: ElzaReg;
+    padding: 1%;
+
+    background-color: #ffc125;
+    border: #a17505 3px double;
+    border-radius: 5%;
+    /* border: ridge; */
+
+    font-family: ElzaReg;
+
+
+}
+
 body {
 
     padding: 2%;
-    font-family: Arial, Helvetica, sans-serif;
+    /* font-family: Arial, Helvetica, sans-serif; */
+    font-family: ElzaReg;
+    /* font-family: Arial, Helvetica, sans-serif; */
+    line-height: 120%;
     
+
+    background-color: (210,210,210);
 }
 .form {
 
@@ -19,6 +65,8 @@ body {
     /* justify-items: center; */
 
     /* border: 5px solid red; */
+
+    font-family: ElzaReg;
 }
 .form form div {
     width: 100%;
@@ -45,6 +93,8 @@ form div input {
     flex-direction: column;
     align-items: center;
     width: 40%;
+
+    font-family: ElzaReg;
 }
 
 #pushbutton {
@@ -90,4 +140,58 @@ canvas {
     border-radius: 50%;
     text-align: center;
     overflow: hidden;
+}
+
+
+.home {
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    justify-self: center;
+}
+#output div {
+    margin: 2%;
+    /* padding: 10%; */
+    /* border: 1px solid #ccc; */
+    /* border-radius: 5px; */
+    background-color: #ffeec2;
+}
+#threebutts button {
+    /* margin: 2%; */
+}
+strong {
+    color: #706853;
+    /* font-weight: bold; */
+    font-family: ElzaLight;
+}
+.age-year-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between; 
+    align-items: center; 
+}
+.nopm {
+    padding: 0% !important; 
+    margin: 0% !important; 
+}
+.columns-container {
+    display: flex;
+    /* gap: 20px;  */
+        /* Spacing between columns */
+    
+    padding: 0% !important; 
+    margin: 0% !important; 
+
+    min-height: 77vh;
+}
+.left-column,
+.right-column {
+    flex: 1; 
+        /* Each column takes equal width */
+    display: flex;
+    flex-direction: column;
+    padding: 2% ; 
+    margin: 2% ; 
+    /* gap: 10px;  */
+        /* Spacing between items in each column */
 }

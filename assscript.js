@@ -25,6 +25,31 @@ let searchInput;
 // List of common words to exclude from connections
 const COMMON_WORDS = new Set(['and', 'i', 'to', 'the', 'a', 'of', 'in', 'it', 'is', 'that', 'with', 'for', 'on', 'are', 'as', 'be', 'at', 'or', 'was', 'but', 'not', 'you', 'this', 'have', 'he', 'she', 'we', 'they', 'my', 'your', 'their', 'our', 'me', 'him', 'her', 'us', 'them', 'when', ' ']);
 
+// Create a Web Worker
+let worker;
+try {
+    worker = new Worker('worker.js');
+} catch (error) {
+    console.error("Failed to create Web Worker:", error);
+    worker = null; // Fallback to main thread
+}
+
+// Listen for messages from the Web Worker
+if (worker) {
+    worker.onmessage = function (event) {
+        console.log("Main script received data from worker:", event.data); // Debugging
+
+        let { filteredBubbles: newFilteredBubbles, filteredConnections: newFilteredConnections } = event.data;
+
+        // Update the filtered bubbles and connections
+        filteredBubbles = newFilteredBubbles;
+        filteredConnections = newFilteredConnections;
+
+        // Redraw the canvas
+        draw();
+    };
+}
+
 // Helper function to split text into words (excluding common words and punctuation)
 function splitIntoWords(text) {
     return text
@@ -48,8 +73,17 @@ function fetchManifestData() {
                 // Split each manifest string by commas and flatten the resulting arrays
                 let newArray = manifestArray.flatMap(manifest => manifest.split(','));
 
-                // Now newArray contains all individual values
-                initializeBubbles(newArray); // Call initializeBubbles with newArray
+                // Assume newArrayP is another array you want to combine
+                // let newArrayP = ["extra1", "extra2", "extra3"]; 
+                    // Example additional array
+                // let newArrayP = manifestArray.flatMap(purpose => purpose.split(','));
+                // let newArrayF = manifestArray.flatMap(feeling => feeling.split(','));
+                // let newArrayTY = manifestArray.flatMap(toyou => toyou.split(','));
+
+
+                // Combine newArray and newArrayP using the spread operator
+                // initializeBubbles([...newArray, ...newArrayP, ...newArrayF, ...newArrayTY]); // Call initializeBubbles with combined arrays
+                initializeBubbles([...newArray]); 
             } else {
                 console.log("No data found");
             }
@@ -58,13 +92,13 @@ function fetchManifestData() {
 }
 
 // Initialize bubbles
-function initializeBubbles(newArray) {
+function initializeBubbles(dataArray) {
     // Clear existing bubbles
     bubbles = [];
 
-    // Iterate over the newArray to create bubbles
-    for (let i = 0; i < newArray.length; i++) {
-        let manifestValue = newArray[i].trim(); // Trim whitespace from the manifest value
+    // Iterate over the dataArray to create bubbles
+    for (let i = 0; i < dataArray.length; i++) {
+        let manifestValue = dataArray[i].trim(); // Trim whitespace from the manifest value
 
         // Skip empty or whitespace-only values
         if (manifestValue === '') {
@@ -78,7 +112,11 @@ function initializeBubbles(newArray) {
             x: random(width), // Random x position within the canvas
             y: random(height), // Random y position within the canvas
             connections: 0, // Initialize connections to 0
-            diameter: calculateBubbleDiameter(manifestValue) // Calculate diameter based on text
+            diameter: 30, // Start with a small diameter
+            expandedDiameter: calculateBubbleDiameter(manifestValue), // Expanded diameter based on text
+            isExpanded: false, // Bubble starts small
+            vx: random(-1, 1), // Random x velocity
+            vy: random(-1, 1) // Random y velocity
         };
         bubbles.push(bubble);
     }
@@ -93,7 +131,8 @@ function initializeBubbles(newArray) {
 
 // Helper function to generate a random color
 function getRandomColor() {
-    const colors = ['#FF5733', '#33FF57', '#3357FF', '#FF33A1', '#A133FF'];
+    // const colors = ['#FF5733', '#33FF57', '#3357FF', '#FF33A1', '#A133FF'];
+    const colors = ['#ffcc32', '#ffd965', '#ffdf7f', '#ffecb2', '#fff2cc'];
     return colors[Math.floor(Math.random() * colors.length)];
 }
 
@@ -183,6 +222,110 @@ function filterBubbles() {
     draw();
 }
 
+// Update bubble positions
+function updateBubblePositions() {
+    for (let bubble of bubbles) {
+        // Only move if not expanded (hovered or clicked)
+        if (!bubble.isExpanded) {
+            bubble.x += bubble.vx;
+            bubble.y += bubble.vy;
+
+            // Constrain the bubble within the canvas boundaries
+            bubble.x = constrain(bubble.x, bubble.diameter / 2, width - bubble.diameter / 2);
+            bubble.y = constrain(bubble.y, bubble.diameter / 2, height - bubble.diameter / 2);
+
+            // Reverse direction if the bubble hits the canvas edge
+            if (bubble.x <= bubble.diameter / 2 || bubble.x >= width - bubble.diameter / 2) {
+                bubble.vx *= -1;
+            }
+            if (bubble.y <= bubble.diameter / 2 || bubble.y >= height - bubble.diameter / 2) {
+                bubble.vy *= -1;
+            }
+        }
+    }
+}
+
+// Draw bubbles and connections
+function draw() {
+    // background(210);
+    background(55)
+
+    // Update bubble positions
+    updateBubblePositions();
+
+    // Draw connections for filtered bubbles
+    for (let conn of filteredConnections) {
+        let bubbleA = conn[0];
+        let bubbleB = conn[1];
+
+        // Set stroke color to black
+        // stroke(23, 23, 222); // Blue color
+        // stroke('hsl(240, 34.70%, 29.40%)')
+        // stroke (210,210,210)
+        stroke (255,255,255)
+        strokeWeight(map(bubbleA.connections, 1, 10, 0.5, 1)); // Adjust stroke weight based on connections
+        line(bubbleA.x, bubbleA.y, bubbleB.x, bubbleB.y);
+
+        // Apply filter invert if connections overlap
+        // if (checkConnectionOverlap(conn)) {
+        //     filter(INVERT);
+        // }
+    }
+
+    // Draw filtered bubbles
+    for (let bubble of filteredBubbles) {
+        // Check if the mouse is over the bubble
+        if (dist(mouseX, mouseY, bubble.x, bubble.y) < bubble.diameter / 2) {
+            bubble.isExpanded = true; // Expand on hover
+        } else if (bubble.id !== clickedInstance) {
+            bubble.isExpanded = false; // Shrink if not clicked or hovered
+        }
+
+        // Set bubble diameter based on expansion state
+        let currentDiameter = bubble.isExpanded ? bubble.expandedDiameter : bubble.diameter;
+
+        fill(bubble.color);
+        noStroke();
+        ellipse(bubble.x, bubble.y, currentDiameter, currentDiameter);
+
+        // Draw text if expanded
+        if (bubble.isExpanded) {
+            drawTextBlock(bubble);
+        }
+
+        // Highlight the clicked bubble
+        if (bubble.id === clickedInstance) {
+            stroke(255, 0, 0); // Red border for the clicked bubble
+            noFill();
+            ellipse(bubble.x, bubble.y, currentDiameter + 10, currentDiameter + 10);
+        }
+    }
+}
+
+// Check if connection lines overlap
+function checkConnectionOverlap(conn) {
+    for (let otherConn of filteredConnections) {
+        if (conn !== otherConn && linesIntersect(conn, otherConn)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Check if two lines intersect
+function linesIntersect(connA, connB) {
+    let x1 = connA[0].x, y1 = connA[0].y, x2 = connA[1].x, y2 = connA[1].y;
+    let x3 = connB[0].x, y3 = connB[0].y, x4 = connB[1].x, y4 = connB[1].y;
+
+    let denom = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
+    if (denom === 0) return false; // Lines are parallel
+
+    let ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denom;
+    let ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / denom;
+
+    return ua >= 0 && ua <= 1 && ub >= 0 && ub <= 1;
+}
+
 // Draw text inside bubbles
 function drawTextBlock(bubble) {
     fill(0); // Text color
@@ -194,7 +337,7 @@ function drawTextBlock(bubble) {
     let currentLine = words[0];
 
     // Calculate the maximum width of text that fits within the circle
-    let maxWidth = bubble.diameter * 0.8; // 80% of the bubble diameter
+    let maxWidth = bubble.expandedDiameter * 0.8; // 80% of the bubble diameter
 
     // Split the text into lines that fit within the circle
     for (let i = 1; i < words.length; i++) {
@@ -227,41 +370,14 @@ function drawTextBlock(bubble) {
     }
 }
 
-// Draw bubbles and connections
-function draw() {
-    background(255);
-
-    // Draw connections for filtered bubbles
-    for (let conn of filteredConnections) {
-        let bubbleA = conn[0];
-        let bubbleB = conn[1];
-
-        // Set stroke color to black
-        stroke(23,23,222); // Black color
-        strokeWeight(map(bubbleA.connections, 1, 10, 0.5, 1)); // Adjust stroke weight based on connections
-        line(bubbleA.x, bubbleA.y, bubbleB.x, bubbleB.y);
-    }
-
-    // Draw filtered bubbles
-    for (let bubble of filteredBubbles) {
-        fill(bubble.color);
-        noStroke();
-        ellipse(bubble.x, bubble.y, bubble.diameter, bubble.diameter);
-        drawTextBlock(bubble); // Draw text inside the bubble
-
-        // Highlight the clicked bubble
-        if (bubble.id === clickedInstance) {
-            stroke(255, 0, 0); // Red border for the clicked bubble
-            noFill();
-            ellipse(bubble.x, bubble.y, bubble.diameter + 10, bubble.diameter + 10);
-        }
-    }
-}
-
 // Make bubbles moveable
 function mouseDragged() {
     for (let bubble of bubbles) {
         if (dist(mouseX, mouseY, bubble.x, bubble.y) < bubble.diameter / 2) {
+            // Stop the bubble's movement
+            bubble.vx = 0;
+            bubble.vy = 0;
+
             // Move the bubble
             bubble.x = mouseX;
             bubble.y = mouseY;
@@ -330,64 +446,90 @@ function mouseClicked() {
 
     if (clickedBubble) {
         console.log("Clicked Bubble:", clickedBubble.instance); // Debugging
-        // Split the clicked bubble's text into words (excluding common words and punctuation)
-        let clickedWords = splitIntoWords(clickedBubble.instance);
 
-        console.log("Clicked Words:", clickedWords); // Debugging
+        // Toggle expansion state
+        clickedBubble.isExpanded = !clickedBubble.isExpanded;
 
-        // Filter bubbles to find those that share at least one word with the clicked bubble
-        filteredBubbles = bubbles.filter(bubble => {
-            if (bubble === clickedBubble) return true; // Always include the clicked bubble
+        // Stop the bubble's movement if expanded
+        if (clickedBubble.isExpanded) {
+            clickedBubble.vx = 0;
+            clickedBubble.vy = 0;
+        }
 
-            // Split the current bubble's text into words (excluding common words and punctuation)
-            let bubbleWords = splitIntoWords(bubble.instance);
+        // Update clickedInstance
+        clickedInstance = clickedBubble.isExpanded ? clickedBubble.id : null;
 
-            // Check if any words match between the clicked bubble and the current bubble
-            return bubbleWords.some(word => clickedWords.includes(word));
-        });
+        // Update search input with the clicked bubble's text
+        searchInput.value(clickedBubble.isExpanded ? clickedBubble.instance : '');
 
-        console.log("Filtered Bubbles:", filteredBubbles); // Debugging
+        // Send data to the Web Worker for filtering (if available)
+        if (worker) {
+            console.log("Main script sending data to worker:", { bubbles, connections, clickedBubble }); // Debugging
+            worker.postMessage({ bubbles, connections, clickedBubble });
+        } else {
+            // Fallback to main thread
+            console.log("Web Worker not available. Filtering in main thread."); // Debugging
+            let { filteredBubbles: newFilteredBubbles, filteredConnections: newFilteredConnections } = filterBubblesInMainThread(bubbles, connections, clickedBubble);
 
-        // Update filteredConnections to include only connections involving filteredBubbles
-        filteredConnections = connections.filter(conn => {
-            let bubbleA = conn[0];
-            let bubbleB = conn[1];
-            return filteredBubbles.includes(bubbleA) && filteredBubbles.includes(bubbleB);
-        });
+            // Update the filtered bubbles and connections
+            filteredBubbles = newFilteredBubbles;
+            filteredConnections = newFilteredConnections;
 
-        console.log("Filtered Connections:", filteredConnections); // Debugging
-
-        // Highlight the clicked bubble
-        clickedInstance = clickedBubble.id;
-        searchInput.value(clickedBubble.instance); // Update the search input with the clicked bubble's text
+            // Redraw the canvas
+            draw();
+        }
     } else {
         // If clicking outside a bubble, reset the view
         clickedInstance = null;
         searchInput.value('');
         filteredBubbles = bubbles;
         filteredConnections = connections;
+        draw(); // Redraw the canvas immediately
     }
+}
 
-    // Redraw the canvas
-    draw();
+// Fallback filtering logic for main thread
+function filterBubblesInMainThread(bubbles, connections, clickedBubble) {
+    let clickedWords = splitIntoWords(clickedBubble.instance);
+
+    let filteredBubbles = bubbles.filter(bubble => {
+        if (bubble === clickedBubble) return true; // Always include the clicked bubble
+
+        let bubbleWords = splitIntoWords(bubble.instance);
+
+        // Check if any words match between the clicked bubble and the current bubble
+        return bubbleWords.some(word => clickedWords.includes(word));
+    });
+
+    let filteredConnections = connections.filter(conn => {
+        let bubbleA = conn[0];
+        let bubbleB = conn[1];
+        return filteredBubbles.includes(bubbleA) && filteredBubbles.includes(bubbleB);
+    });
+
+    return { filteredBubbles, filteredConnections };
 }
 
 // Setup the canvas and UI
 function setup() {
     createCanvas(windowWidth, windowHeight);
 
+    // background('rgba(210, 210, 210, 1)');
+    // background(51);
+
+
     searchInput = createInput();
     searchInput.position(88, 88);
     searchInput.size(222);
     searchInput.attribute('placeholder', 'Search...');
-    searchInput.input(filterBubbles);
+    searchInput.input(filterBubbles); // Call filterBubbles when the input changes
 
     let clearButton = createButton('Clear');
     clearButton.position(320, 88);
     clearButton.mousePressed(() => {
         searchInput.value('');
         clickedInstance = null;
-        filterBubbles();
+        filterBubbles(); // Call filterBubbles when the clear button is pressed
     });
 
     fetchManifestData(); // Fetch data from Firebase
