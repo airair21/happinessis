@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta charset="utf-8"> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Word Association</title>
+        <link rel="stylesheet" href="style.css">
+        <link rel="icon" href="">
+    <script crossorigin="anonymous" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/p5.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.1/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.1/addons/p5.sound.min.js"></script>
+
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+
+
+</head>
+<body class="">
+
+
+    <!-- <div id="instructions-toggle">Show Instructions</div> -->
+    <div id="instructions">
+        <h3>How to Use This Visualization</h3>
+        <ul>
+            <li><strong>Click on age groups</strong> (large circles) to zoom in</li>
+            <li><strong>Click on individual bubbles</strong> to see detailed responses</li>
+            <li><strong>Click on the background</strong> or the Reset button to zoom out</li>
+            <li><strong>Hover over bubbles</strong> to see quick previews</li>
+            <li>Larger bubbles represent current responses, smaller ones are historical</li>
+        </ul>
+        <button id="close-instructions">Got It!</button>
+    </div>
+    
+    <div id="chart-container">
+        <div id="loading" class="loading">Loading data from dataset...</div>
+        <div id="tooltip"></div>
+    </div>
+    <div id="controls">
+        <button id="reset">Reset View</button>
+    </div>
+    <div id="details-panel">
+        <button class="close-panel">×</button>
+        <div id="details-content"></div>
+    </div>
+    
+
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase.js"></script>
+    <script src="age.js"></script>
+</body>
+</html>
+
+

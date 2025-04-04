@@ -35,8 +35,9 @@ button {
     /* border: ridge; */
 
     font-family: ElzaReg;
-
-
+}
+button:hover {
+    background-color: #a17505;
 }
 
 body {
@@ -194,4 +195,195 @@ strong {
     margin: 2% ; 
     /* gap: 10px;  */
         /* Spacing between items in each column */
+}
+
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+#chart-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    /* background: #f9f9f9; */
+    background: #373737;
+  }
+  #controls {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+  }
+  #tooltip {
+    position: absolute;
+    background: white;
+    padding: 12px;
+    border-radius: 6px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    pointer-events: none;
+    opacity: 0;
+    max-width: 300px;
+    font-size: 14px;
+    line-height: 1.4;
+    transition: opacity 0.2s;
+  }
+.loading {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 18px;
+  color: #666;
+}
+.age-label {
+    font-size: 12px;
+    fill: white;
+    text-anchor: middle;
+    font-weight: bold;
+    pointer-events: none;
+    transition: opacity 0.2s; /* Smooth fade in/out */
+}
+.count-indicator {
+  font-size: 12px;
+  fill: white;
+  text-anchor: middle;
+  font-weight: bold;
+  pointer-events: none;
+}
+#details-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: 100vh;
+    background: white;
+    box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+    padding: 20px;
+    overflow-y: auto;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 100;
+}
+#details-panel.visible {
+    transform: translateX(0);
+}
+#details-panel h3 {
+    margin-top: 0;
+    color: #333;
+}
+.close-panel {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+#instructions {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.9);
+    padding: 10px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    max-width: 80%;
+    z-index: 100;
+    display: none;
+}
+  
+#instructions-toggle {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 100;
+    padding: 8px 15px;
+    background: #ffcc32;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+
+.cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3%;
+    justify-content: center;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+.card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px #ffd8657c;
+    padding: 3vh;
+    margin-bottom: 5vh;
+    width: 30%; 
+    transition: all 0.3s ease;
+    position: relative;
+}
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px #ffcc32;
+}
+.card h3 {
+    margin-top: 0;
+    color: #ffd965;
+    border-bottom: 2px solid #f1f1f1;
+    padding-bottom: 1%;
+    margin-bottom: 5%;
+}
+.card p {
+    margin: 10px 0;
+    color: #555;
+    line-height: 1.5;
+}
+.card p strong {
+    color: #b2b2b2;
+    font-weight: 600;
+}
+
+.controls {
+    margin: 20px auto;
+    max-width: 300px;
+    text-align: center;
+}
+.controls label {
+    margin-right: 10px;
+    font-weight: bold;
+}
+.controls select {
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    font-size: 16px;
+}
+
+.particle {
+    position: absolute;
+    will-change: transform, opacity;
+}
+
+
+@media (max-width: 768px) {
+    .cards-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .card {
+        width: 100%;
+        max-width: 350px;
+    }
 }
