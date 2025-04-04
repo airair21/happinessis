@@ -128,7 +128,10 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = 'association.html';
     });
     document.getElementById('viewgraph').addEventListener('click', () => {
-        // window.location.href = 'form.html';
+        window.location.href = 'age.html';
+    });
+    document.getElementById('viewall').addEventListener('click', () => {
+        window.location.href = 'cards.html';
     });
 });
 

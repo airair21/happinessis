@@ -1,4 +1,4 @@
-// Your existing Firebase configuration and initialization
+// Firebase configuration and initialization
 const firebaseConfig = {
     apiKey: "AIzaSyB1jslHXmb08Se0APqMo6lGwMTaubkpd3Q",
     authDomain: "happiness-is-api.firebaseapp.com",
@@ -15,29 +15,107 @@ const dataRef = database.ref('inputs');
 const container = document.getElementById('cardsContainer');
 container.innerHTML = '<div class="loading">Loading happiness data...</div>';
 
-// Function to hide a card for X hours
+// Utility functions
+function shuffleArray(array) {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+}
+
 function hideCardForHours(cardId, hours = 4) {
     const now = new Date();
     const hiddenUntil = new Date(now.getTime() + hours * 60 * 60 * 1000);
     localStorage.setItem(`hidden_${cardId}`, hiddenUntil.toISOString());
 }
 
-// Function to check if card should be hidden
 function isCardHidden(cardId) {
     const hiddenUntil = localStorage.getItem(`hidden_${cardId}`);
     if (!hiddenUntil) return false;
-    
-    const now = new Date();
-    const hiddenTime = new Date(hiddenUntil);
-    return now < hiddenTime;
+    return new Date() < new Date(hiddenUntil);
 }
 
-// Function to save card as PNG
-function saveCardAsPNG(cardElement) {
+// Particle effect functions
+function createParticles(element) {
+    const rect = element.getBoundingClientRect();
+    const particles = [];
+    const particleCount = 30;
+    
+    // Your specified color palette
+    const colorPalette = ['#ffcc32', '#ffd965', '#ffdf7f', '#ffecb2', '#fff2cc'];
+    
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        
+        const x = Math.random() * rect.width;
+        const y = Math.random() * rect.height;
+        const size = 5 + Math.random() * 5;
+        
+        // Select a random color from your palette
+        const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+        
+        particle.style.cssText = `
+            position: fixed;
+            width: ${size}px;
+            height: ${size}px;
+            background: ${color};
+            border-radius: 50%;
+            left: ${rect.left + x}px;
+            top: ${rect.top + y}px;
+            pointer-events: none;
+            z-index: 1000;
+            transform: translate(-50%, -50%);
+            will-change: transform, opacity;
+        `;
+        
+        document.body.appendChild(particle);
+        particles.push(particle);
+    }
+    return particles;
+}
+
+function animateParticles(particles) {
+    particles.forEach((particle, index) => {
+        const angle = Math.random() * Math.PI * 2;
+        const distance = 50 + Math.random() * 100;
+        const rotation = Math.random() * 360;
+        const sizeEnd = Math.random() * 0.5;
+        
+        const animation = particle.animate([
+            { 
+                transform: 'translate(0, 0) rotate(0deg) scale(1)',
+                opacity: 1,
+                filter: 'blur(0px)'
+            },
+            { 
+                transform: `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px) rotate(${rotation}deg) scale(${sizeEnd})`,
+                opacity: 0,
+                filter: 'blur(2px)'
+            }
+        ], {
+            duration: 800 + Math.random() * 400,
+            easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+            delay: index * 20
+        });
+        
+        animation.onfinish = () => particle.remove();
+    });
+}
+
+// Card saving and display functions
+async function saveCardAsPNG(cardElement) {
     return new Promise((resolve) => {
         html2canvas(cardElement).then(canvas => {
             const link = document.createElement('a');
-            link.download = `happiness-card-${Date.now()}.png`;
+            // link.download = `happiness-card-${Date.now()}.png`;
+            let counter = localStorage.getItem('downloadCounter') || 0;
+            counter++;
+            localStorage.setItem('downloadCounter', counter);
+            link.download = `happiness-card-${counter.toString().padStart(4, '0')}.png`;
+            // Example: "happiness-card-0042.png"            
             link.href = canvas.toDataURL('image/png');
             link.click();
             resolve();
@@ -45,7 +123,6 @@ function saveCardAsPNG(cardElement) {
     });
 }
 
-// Function to create confirmation modal
 function showConfirmationModal(cardElement, cardId) {
     const modal = document.createElement('div');
     modal.className = 'confirmation-modal';
@@ -62,7 +139,6 @@ function showConfirmationModal(cardElement, cardId) {
     
     document.body.appendChild(modal);
     
-    // Handle button clicks
     modal.querySelector('.cancel-btn').addEventListener('click', () => {
         document.body.removeChild(modal);
     });
@@ -70,13 +146,24 @@ function showConfirmationModal(cardElement, cardId) {
     modal.querySelector('.confirm-btn').addEventListener('click', async () => {
         modal.querySelector('.confirm-btn').textContent = 'Saving...';
         await saveCardAsPNG(cardElement);
-        hideCardForHours(cardId);
-        cardElement.style.display = 'none';
-        document.body.removeChild(modal);
+        
+        // Create and animate particles
+        const particles = createParticles(cardElement);
+        animateParticles(particles);
+        
+        // Fade out card
+        cardElement.style.transition = 'opacity 0.3s ease';
+        cardElement.style.opacity = '0';
+        
+        setTimeout(() => {
+            hideCardForHours(cardId);
+            cardElement.style.display = 'none';
+            document.body.removeChild(modal);
+        }, 300);
     });
 }
 
-// Modified renderCards function
+// Main render function
 function renderCards(data) {
     container.innerHTML = '';
     
@@ -89,7 +176,6 @@ function renderCards(data) {
     
     shuffledData.forEach((item, index) => {
         const cardId = `card-${item.age}-${item.feeling}-${index}`;
-        
         if (isCardHidden(cardId)) return;
         
         const card = document.createElement('div');
@@ -98,16 +184,16 @@ function renderCards(data) {
         
         card.innerHTML = `
             <p><strong>Age:</strong> ${item.age}</p>
-            <p><strong>Feeling:</strong> ${item.feeling}</p>
-            <p><strong>Manifesting:</strong> ${item.manifest}</p>
-            <p><strong>Life Purpose:</strong> ${item.purpose}</p>
+            <p><strong>How would you define happiness through a different emotion or feeling?</strong> ${item.feeling}</p>
+            <p><strong>How does happiness manifest in your life?</strong> ${item.manifest}</p>
+            <p><strong>How does happiness influence your sense of purpose?</strong> ${item.purpose}</p>
             <br>
             <div class="toyou-section">
                 <p><strong>Current Year:</strong> ${item.currentYear}</p>
-                <p><strong>To You:</strong> ${item.toyou}</p>
-                <p><strong>To You ×2:</strong> ${item.toyou2}</p>
-                <p><strong>To You ×5:</strong> ${item.toyou5}</p>
-                <p><strong>To You ×10:</strong> ${item.toyou10}</p>
+                <p><strong>What is happiness to you right now?</strong> ${item.toyou}</p>
+                <p><strong>2 years ago?</strong> ${item.toyou2}</p>
+                <p><strong>5 years ago?</strong> ${item.toyou5}</p>
+                <p><strong>10 years ago?</strong> ${item.toyou10}</p>
             </div>
         `;
         
@@ -119,70 +205,12 @@ function renderCards(data) {
     });
 }
 
-// Add this CSS (either in your stylesheet or in a <style> tag)
-const style = document.createElement('style');
-style.textContent = `
-    .confirmation-modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0,0,0,0.5);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-    }
-    
-    .modal-content {
-        background: white;
-        padding: 20px;
-        border-radius: 8px;
-        text-align: center;
-        max-width: 300px;
-        width: 100%;
-    }
-    
-    .modal-buttons {
-        display: flex;
-        justify-content: space-around;
-        margin-top: 20px;
-    }
-    
-    .modal-buttons button {
-        padding: 8px 16px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-    
-    .cancel-btn {
-        background: #f1f1f1;
-    }
-    
-    .confirm-btn {
-        background: #4CAF50;
-        color: white;
-    }
-`;
-document.head.appendChild(style);
-
-// Add html2canvas library for saving as PNG
+// Load html2canvas dynamically
 const script = document.createElement('script');
 script.src = 'https://html2canvas.hertzen.com/dist/html2canvas.min.js';
 document.head.appendChild(script);
 
-// Your existing shuffleArray and dataRef.on code...
-function shuffleArray(array) {
-    const newArray = [...array];
-    for (let i = newArray.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-    }
-    return newArray;
-}
-
+// Fetch data from Firebase
 dataRef.on('value', (snapshot) => {
     const data = snapshot.val();
     const dataArray = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
@@ -191,4 +219,3 @@ dataRef.on('value', (snapshot) => {
     console.error("Error reading data: ", error);
     container.innerHTML = '<div class="loading">Error loading data. Please try again later.</div>';
 });
-

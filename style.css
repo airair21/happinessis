@@ -155,7 +155,7 @@ canvas {
     /* padding: 10%; */
     /* border: 1px solid #ccc; */
     /* border-radius: 5px; */
-    background-color: #ffeec2;
+    /* background-color: #ffeec2; */
 }
 #threebutts button {
     /* margin: 2%; */
@@ -163,7 +163,8 @@ canvas {
 strong {
     color: #706853;
     /* font-weight: bold; */
-    font-family: ElzaLight;
+    /* font-family: ElzaLight; */
+    font-family: ElzaLight !important;
 }
 .age-year-container {
     display: flex;
@@ -183,7 +184,20 @@ strong {
     padding: 0% !important; 
     margin: 0% !important; 
 
+    margin-top: 2% !important;
+
     min-height: 77vh;
+
+
+
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px #ffd8657c;
+    padding: 3vh;
+    margin-bottom: 5vh;
+    /* width: 30%;  */
+    transition: all 0.3s ease;
+    position: relative;
 }
 .left-column,
 .right-column {
@@ -351,7 +365,9 @@ strong {
 }
 .card p strong {
     color: #b2b2b2;
-    font-weight: 600;
+    /* font-weight: 600; */
+
+    font-family: ElzaLight !important;
 }
 
 .controls {
@@ -370,6 +386,50 @@ strong {
     font-size: 16px;
 }
 
+
+.confirmation-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    max-width: 300px;
+    width: 100%;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.modal-buttons button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.cancel-btn {
+    background: #f1f1f1;
+}
+
+.confirm-btn {
+    background: #ffcc32;
+    color: white;
+}
 .particle {
     position: absolute;
     will-change: transform, opacity;
