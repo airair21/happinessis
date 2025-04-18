@@ -122,16 +122,21 @@ window.onload = fetchAndDisplayData;
 
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('adddata').addEventListener('click', () => {
-        window.location.href = 'form.html'; // Ensure the path is correct
+        // window.location.href = 'form.html'; // Ensure the path is correct
+        window.open('https://www.thisisjaxwong.com/happinessis/form.html', '_blank');
     });
     document.getElementById('viewword').addEventListener('click', () => {
-        window.location.href = 'association.html';
+        // window.location.href = 'association.html';
+        window.open('https://www.thisisjaxwong.com/happinessis/association.html', '_blank');
+        
     });
     document.getElementById('viewgraph').addEventListener('click', () => {
-        window.location.href = 'age.html';
+        // window.location.href = 'age.html';
+        window.open('https://www.thisisjaxwong.com/happinessis/age.html', '_blank');
     });
     document.getElementById('viewall').addEventListener('click', () => {
-        window.location.href = 'cards.html';
+        // window.location.href = 'cards.html';
+        window.open('https://www.thisisjaxwong.com/happinessis/cards.html', '_blank');
     });
 });
 
